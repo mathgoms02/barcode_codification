@@ -1,13 +1,14 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
 from barcode_codification import inser, crea
 import pyautogui as pygui
 
 def main():
     root = tk.Tk()
     root.title('Key Generator (barcode)')
-    root.geometry('600x270')
+    root.geometry('600x500')
     root.resizable(width=False, height=False)
     root.configure(background='#000000')
 
@@ -27,6 +28,9 @@ def main():
     box_re = tk.Entry(root, width=60)
     box_re.pack(pady=1)
 
+
+
+
     def add_barcode():
         name = box_name.get()
         re = box_re.get()
@@ -39,12 +43,17 @@ def main():
         box_name.delete(0, END)
         box_re.delete(0, END)
 
+        table_operator.insert("", tk.END, values=(name, re))
+
         pygui.hotkey('shift', 'tab')
 
     def create_barcode():
         try:
             crea()
             messagebox.showinfo('Sucesso!', 'Código(s) de barra criado com sucesso!!!')
+
+            table_operator.delete(*table_operator.get_children())
+
         except Exception as err:
             messagebox.showinfo('ERROR', str(err))
         
@@ -56,6 +65,22 @@ def main():
     button_create = Button(root, text='Create', width=5, font=('Montserrat', 12, 'bold'), command=create_barcode)
     button_create.configure(bg="#808080", fg="black", relief="raised", padx=10, pady=5, activebackground="#808080")
     button_create.place(x=300, y=190)
+
+    # Criando tabela para usuário ver os QRCodes ja criado
+    table_operator = ttk.Treeview(root)
+    table_operator["columns"] = ("Nome", "RE")
+
+    # Formatando colunas
+    table_operator.column("#0", width=0, stretch=tk.NO)
+    table_operator.column("Nome", width=120, anchor="center")
+    table_operator.column("RE", width=120, anchor="center")
+
+    # Definindo cabeçalho
+    table_operator.heading("#0", text="", anchor=tk.W)
+    table_operator.heading("Nome", text="Nome", anchor=tk.W)
+    table_operator.heading("RE", text="RE", anchor=tk.W)
+
+    table_operator.place(x=175, y=250)
 
     root.mainloop()
 
